@@ -81,9 +81,7 @@ def test_visit():
     assert obs.planes[product_id].data_release != datetime(2023, 8, 1), \
         'wrong pre-condition'
 
-    # pre-conditions
-    kwargs = {'science_file': f_name}
-
+    kwargs = {}
     test_result = release_date_augmentation.visit(obs, **kwargs)
     assert test_result is not None, 'expect a result'
     assert test_result.get('planes') is not None, 'expect plane count'

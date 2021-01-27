@@ -261,7 +261,7 @@
     <caom2:plane caom2:id="00000000-0000-0000-b2d3-0eaa209e8f55" caom2:lastModified="2015-02-09T16:18:38.733" caom2:maxLastModified="2017-11-29T18:38:48.040" caom2:metaChecksum="md5:c0ef4a1da6a273f211ebcb907fbe48a3" caom2:accMetaChecksum="md5:1d4748212a44eb34f335f4402e72d497" caom2:metaProducer="cfht2caom2/0.3.2">
       <caom2:productID>781920o</caom2:productID>
       <caom2:metaRelease>2005-02-23T05:49:01.000</caom2:metaRelease>
-      <caom2:dataRelease>2006-02-24T05:49:01.000</caom2:dataRelease>
+      <caom2:dataRelease>2023-08-01T00:00:00.000</caom2:dataRelease>
       <caom2:dataProductType>spectrum</caom2:dataProductType>
       <caom2:calibrationLevel>1</caom2:calibrationLevel>
       <caom2:provenance>
@@ -393,7 +393,7 @@
     <caom2:plane caom2:id="00000000-0000-0000-2e92-0eaa20a92974" caom2:lastModified="2015-02-09T16:18:38.733" caom2:maxLastModified="2017-11-29T18:38:48.040" caom2:metaChecksum="md5:2252213842536972a8b86929307123cf" caom2:accMetaChecksum="md5:641e0e402d9ebbd1403ef94bf1cd7c07" caom2:metaProducer="cfht2caom2/0.3.2">
       <caom2:productID>781920p</caom2:productID>
       <caom2:metaRelease>2005-02-23T05:49:01.000</caom2:metaRelease>
-      <caom2:dataRelease>2006-02-24T05:49:01.000</caom2:dataRelease>
+      <caom2:dataRelease>2023-08-01T00:00:00.000</caom2:dataRelease>
       <caom2:dataProductType>spectrum</caom2:dataProductType>
       <caom2:calibrationLevel>2</caom2:calibrationLevel>
       <caom2:provenance>

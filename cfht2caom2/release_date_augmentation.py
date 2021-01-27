@@ -90,19 +90,12 @@ def visit(observation, **kwargs):
     """
     mc.check_param(observation, Observation)
 
-    science_file = kwargs.get('science_file')
-    if science_file is None:
-        raise mc.CadcException('Visitor needs a science_file parameter.')
-
-    cfht_name = cn.CFHTName(file_name=science_file,
-                            instrument=observation.instrument.name)
-    # CAOM2 datetime values are datetime naive
+    # CAOM2 datetime values are tz naive
     new_date = datetime(year=2023, month=8, day=1)
     count = 0
     for plane in observation.planes.values():
-        for artifact in plane.artifacts.values():
-            if cfht_name.file_uri == artifact.uri:
-                plane.data_release = new_date
-                count += 1
+        if plane.product_id.endswith('o') or plane.product_id.endswith('p'):
+            plane.data_release = new_date
+            count += 1
 
     return {'planes': count}
