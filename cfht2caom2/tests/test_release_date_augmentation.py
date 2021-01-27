@@ -65,44 +65,28 @@
 #  $Revision: 4 $
 #
 # ***********************************************************************
-#
 
 from datetime import datetime
-
-from caom2 import Observation
 from caom2pipe import manage_composable as mc
-from cfht2caom2 import cfht_name as cn
+from cfht2caom2 import release_date_augmentation
+
+import test_main_app
 
 
-def visit(observation, **kwargs):
-    """
-    All the CFIS release data are being updated for a new release date of
-    Aug 1, 2023. Although CFHT is currently transferring all the updated FITS
-    files, this is not clear the transfer and ingestion to CAOM2 will be done
-    by Feb 1 which is the date of the current release.
+def test_visit():
+    product_id = '2497354o'
+    f_name = f'{product_id}.fits.fz'
+    obs_fqn = f'{test_main_app.TEST_DATA_DIR}/visit_obs_start_release_date.xml'
+    obs = mc.read_obs_from_file(obs_fqn)
+    assert obs.planes[product_id].data_release != datetime(2023, 8, 1), \
+        'wrong pre-condition'
 
-    Could we actually bypass and update CAOM2 entries with only the release
-    date?
+    # pre-conditions
+    kwargs = {'science_file': f_name}
 
-    :param observation:
-    :param kwargs:
-    :return:
-    """
-    mc.check_param(observation, Observation)
-
-    science_file = kwargs.get('science_file')
-    if science_file is None:
-        raise mc.CadcException('Visitor needs a science_file parameter.')
-
-    cfht_name = cn.CFHTName(file_name=science_file,
-                            instrument=observation.instrument.name)
-    # CAOM2 datetime values are datetime naive
-    new_date = datetime(year=2023, month=8, day=1)
-    count = 0
-    for plane in observation.planes.values():
-        for artifact in plane.artifacts.values():
-            if cfht_name.file_uri == artifact.uri:
-                plane.data_release = new_date
-                count += 1
-
-    return {'planes': count}
+    test_result = release_date_augmentation.visit(obs, **kwargs)
+    assert test_result is not None, 'expect a result'
+    assert test_result.get('planes') is not None, 'expect plane count'
+    assert test_result.get('planes') == 1, 'wrong plane count'
+    assert obs.planes[product_id].data_release == datetime(2023, 8, 1), \
+        'expect to assign'
