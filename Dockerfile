@@ -1,20 +1,23 @@
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
-ADD https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz /usr/local/src/
+ARG PYTHON_VERSION=3.13.3
+ADD https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz /usr/local/src/
 
 RUN apt-get update --no-install-recommends \
     && apt-get install -y \
         gcc \
         g++ \
         git \
+        libc-bin \
         libc6-dev \
         libcfitsio-bin \
         libcfitsio-dev \
         libgdbm-dev \
         libhdf5-dev \
+        liblzma-dev \
         libncursesw5-dev \
-        libreadline-gplv2-dev \
+        libreadline-dev \
         libsqlite3-dev \
         libssl-dev \
         libbz2-dev \
@@ -24,29 +27,30 @@ RUN apt-get update --no-install-recommends \
         saods9 \
         tk-dev \
         xvfb \
+        xz-utils \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ /tmp/* /var/tmp/*
 
 WORKDIR /usr/src/app
 
 RUN cd /usr/local/src \
-    && tar zxvf Python-3.9.10.tgz \
-    && cd Python-3.9.10 \
+    && tar zxvf Python-${PYTHON_VERSION}.tgz \
+    && cd Python-${PYTHON_VERSION} \
     && ./configure --enable-optimizations --prefix=/usr/local \
     && make \
     && make install \
     && ln -s /usr/local/bin/python3 /usr/local/bin/python \
     && ln -s /usr/local/bin/pip3 /usr/local/bin/pip \
     && cd /usr/src/app \
-    && rm -rf /usr/local/src/Python-3.9.10
+    && rm -rf /usr/local/src/Python-${PYTHON_VERSION}
 
 RUN pip install --no-cache-dir wheel
 
-RUN pip install --no-cache-dir "astropy<5" \
+RUN pip install --no-cache-dir astropy \
     && pip install pytz \
     && pip install pyyaml
 
-ARG FITSVERIFY_VERSION=4.20
+ARG FITSVERIFY_VERSION=4.22
 ARG FITSVERIFY_URL=https://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/fitsverify-${FITSVERIFY_VERSION}.tar.gz
 ADD ${FITSVERIFY_URL}  /usr/local/src/
 RUN cd /usr/local/src \
@@ -64,6 +68,7 @@ ADD ${H5CHECK_URL} /usr/local/src/
 RUN cd /usr/local/src && \
     tar xvf h5check-${H5CHECK_VERSION}.tar.gz && \
     cd h5check-${H5CHECK_VERSION} && \
+    export CFLAGS="-O2 -g -fcommon" && \
     ./configure && \
     make && \
     cp tool/h5check /usr/local/bin && \
