@@ -1,7 +1,7 @@
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG PYTHON_VERSION=3.13.3
+ARG PYTHON_VERSION=3.10.20
 ADD https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz /usr/local/src/
 
 RUN apt-get update --no-install-recommends \
@@ -11,21 +11,24 @@ RUN apt-get update --no-install-recommends \
         git \
         libc-bin \
         libc6-dev \
+        libbz2-dev \
         libcfitsio-bin \
         libcfitsio-dev \
+        libexpat1-dev \
+        libffi-dev \
         libgdbm-dev \
         libhdf5-dev \
         liblzma-dev \
-        libncursesw5-dev \
+        libncurses-dev \
+        libnsl-dev \
         libreadline-dev \
         libsqlite3-dev \
         libssl-dev \
-        libbz2-dev \
-        libffi-dev \
         libtool \
         make \
         saods9 \
         tk-dev \
+        uuid-dev \
         xvfb \
         xz-utils \
         zlib1g-dev \
@@ -44,11 +47,12 @@ RUN cd /usr/local/src \
     && cd /usr/src/app \
     && rm -rf /usr/local/src/Python-${PYTHON_VERSION}
 
-RUN pip install --no-cache-dir wheel
+RUN pip install --upgrade pip
 
-RUN pip install --no-cache-dir astropy \
-    && pip install pytz \
-    && pip install pyyaml
+RUN pip install --no-cache-dir wheel \
+    astropy \
+    pytz \
+    pyyaml
 
 ARG FITSVERIFY_VERSION=4.22
 ARG FITSVERIFY_URL=https://heasarc.gsfc.nasa.gov/docs/software/ftools/fitsverify/fitsverify-${FITSVERIFY_VERSION}.tar.gz
@@ -63,12 +67,12 @@ RUN cd /usr/local/src \
   && rm -rf /usr/local/src/fitsverify-${FITSVERIFY_VERSION}
 
 ARG H5CHECK_VERSION=2.0.1
-ARG H5CHECK_URL=https://support.hdfgroup.org/ftp/HDF5/tools/h5check/src/h5check-${H5CHECK_VERSION}.tar.gz 
+ARG H5CHECK_URL=https://support.hdfgroup.org/ftp/HDF5/tools/h5check/src/h5check-${H5CHECK_VERSION}.tar.gz
 ADD ${H5CHECK_URL} /usr/local/src/
 RUN cd /usr/local/src && \
     tar xvf h5check-${H5CHECK_VERSION}.tar.gz && \
     cd h5check-${H5CHECK_VERSION} && \
-    export CFLAGS="-O2 -g -fcommon" && \
+    export CFLAGS="-O2 -g -fcommon -Wno-implicit-function-declaration" && \
     ./configure && \
     make && \
     cp tool/h5check /usr/local/bin && \
@@ -76,12 +80,12 @@ RUN cd /usr/local/src && \
     rm -rf /usr/local/src/h5check-${H5CHECK_VERSION}
 
 ARG OPENCADC_BRANCH=main
-ARG OPENCADC_REPO=opencadc
+ARG OPENCADC_REPO=opencadc-metadata-curation
 RUN git clone https://github.com/opencadc/caom2tools.git && \
     cd caom2tools && \
     pip install ./caom2utils && \
     cd ..
-RUN pip install git+https://github.com/${OPENCADC_REPO}/caom2pipe@${OPENCADC_BRANCH}#egg=caom2pipe
+RUN pip install git+https://github.com/opencadc-metadata-curation/caom2pipe@main#egg=caom2pipe
 RUN pip install git+https://github.com/${OPENCADC_REPO}/cfht2caom2@${OPENCADC_BRANCH}#egg=cfht2caom2
 
 RUN useradd --create-home --shell /bin/bash cadcops
